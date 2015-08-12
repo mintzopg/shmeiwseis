@@ -1,0 +1,75 @@
+1. What is a data.table
+
+Goal 1: Reduce programming time (fewer function calls, less variable name repetition)
+Goal 2: REduce compute time (fast aggregation, update by reference)
+Currently in memory: 64 bit and 100GB is routine
+Ordered joins: useful in finance (time series) etc.
+
+*** General form ***
+
+mtcarsDT[
+        mpg > 20, 
+        .(AvgHP = mean(hp),
+        "MinWT(kg)" = min(wt*453.6)), # wt lbs
+        by = .(cyl, under5gears = gear < 5)
+
+R:      i       j       by
+SQL:    WHERE   SELECT  GROUP BY
+
+> DT[i, j, by] # Take DT, subset rows using i, then calculate j grouped by "by"
+
+***Create a data.table, General form ***
+
+> DT <- data.table(A = 1:6, B = c('a', 'b', 'c'), C = rnorm(6), D = TRUE)
+
+*** Selecting rows by number in i... ***
+
+> DT[3:5, ] same as DT[3:5]
+
+the data.table is a data.frame too
+> class(DT)
+[1] "data.table" "data.frame"
+redirects to data.frame for those packages which don't know about data.table
+
+*** Selecting columns in j ***
+
+> DT[, .(B, C)] # .() is an alias to list() in data.tables and they mean the same
+
+*** Computing on Columns ***
+
+> DT[, .(Total = sum(A), Mean = mean(c))]  # introduce new variables by using columns as variables and aplying functions on them
+
+You can do anything in columns j, e.g. use plot on them
+
+> DT[, plot(A, C)] # plot returns a vaule NULL and outputs a plot on screen
+
+we can use {} to mark a block on statements inside columns
+
+> DT[, { print(A)
+	 hist(C)
+	 NULL  }]
+
+*** Throw away columns ***
+
+> DT <- DT[-col-name]
+> D <- 5
+> DT
+  A B C
+1:1 a 6
+2:2 b 7
+3:3 c 8 
+4:4 d 9 
+5:5 e 10
+Then DT[, D] returns a vector
+[1] 5
+and DT[, .(D)] returns a data.table
+Column D does not exist in DT for it to be seen as a variable
+to return its value, so it looks for D in DT's parent frame.
+Not that .() in j always returns a data.table
+
+*** Doing j by group ***
+Note: Think ..."Take DT, subset using i, then calculate j grouped by by"
+
+
+
+ 
